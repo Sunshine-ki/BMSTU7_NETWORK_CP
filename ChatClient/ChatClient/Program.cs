@@ -59,6 +59,8 @@ namespace ChatClient
         {
             while (true)
             {
+                Console.WriteLine("123");
+
                 try
                 {
                     byte[] data = new byte[64]; // буфер для получаемых данных
@@ -66,11 +68,7 @@ namespace ChatClient
                     int bytes = 0;
                     do
                     {
-                        Console.WriteLine($"stream.DataAvailable = {stream.DataAvailable}");
-
                         bytes = stream.Read(data, 0, data.Length);
-                        Console.WriteLine($"read");
-
                         builder.Append(Encoding.Unicode.GetString(data, 0, bytes));
                     }
                     while (stream.DataAvailable);
