@@ -12,6 +12,12 @@ namespace ChatServer
     {
         static TcpListener tcpListener; // сервер для прослушивания
         List<ClientObject> clients = new List<ClientObject>(); // все подключения
+        List<string> nicknames = new List<string>();
+
+        protected internal bool ContainNicknames(string nickname)
+        {
+            return clients.Count(c => c.Nickname == nickname) > 0;
+        }    
 
         protected internal void AddConnection(ClientObject clientObject)
         {

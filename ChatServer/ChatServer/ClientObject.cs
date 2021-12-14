@@ -7,17 +7,17 @@ namespace ChatServer
     public class ClientObject
     {
         protected internal string Id { get; private set; }
+        protected internal string Nickname { get; private set; }
         protected internal NetworkStream Stream { get; private set; }
-        string userName;
         TcpClient client;
         ServerObject server; // объект сервера
+
 
         public ClientObject(TcpClient tcpClient, ServerObject serverObject)
         {
             Id = Guid.NewGuid().ToString();
             client = tcpClient;
             server = serverObject;
-            serverObject.AddConnection(this);
         }
 
         public void Process()
@@ -25,11 +25,11 @@ namespace ChatServer
             try
             {
                 Stream = client.GetStream();
-                // получаем имя пользователя
-                string message = GetMessage();
-                userName = message;
 
-                message = userName + " вошел в чат";
+                Nickname = GetFreeNickname();
+                server.AddConnection(this);
+
+                var message = Nickname + " вошел в чат";
                 // посылаем сообщение о входе в чат всем подключенным пользователям
                 server.BroadcastMessage(message, this.Id);
                 Console.WriteLine(message);
@@ -39,13 +39,13 @@ namespace ChatServer
                     try
                     {
                         message = GetMessage();
-                        message = String.Format("{0}: {1}", userName, message);
+                        message = String.Format("{0}: {1}", Nickname, message);
                         Console.WriteLine(message);
                         server.BroadcastMessage(message, this.Id);
                     }
                     catch
                     {
-                        message = String.Format("{0}: покинул чат", userName);
+                        message = String.Format("{0}: покинул чат", Nickname);
                         Console.WriteLine(message);
                         server.BroadcastMessage(message, this.Id);
                         break;
@@ -62,6 +62,24 @@ namespace ChatServer
                 server.RemoveConnection(this.Id);
                 Close();
             }
+        }
+
+        private string GetFreeNickname()
+        {
+            var nickname = GetMessage();
+            byte[] data;
+
+            while (server.ContainNicknames(nickname))
+            {
+                data = BitConverter.GetBytes(0);
+                Stream.Write(data, 0, data.Length);
+                nickname = GetMessage();
+            }
+            
+            data = BitConverter.GetBytes(1);
+            Stream.Write(data, 0, data.Length);
+
+            return nickname;
         }
 
         // чтение входящего сообщения и преобразование в строку

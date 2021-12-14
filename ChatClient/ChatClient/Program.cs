@@ -15,17 +15,13 @@ namespace ChatClient
 
         static void Main(string[] args)
         {
-            Console.Write("Введите свое имя: ");
-            userName = Console.ReadLine();
             client = new TcpClient();
             try
             {
                 client.Connect(host, port); //подключение клиента
-                stream = client.GetStream(); // получаем поток
+                stream = client.GetStream(); // получаем поток
 
-                string message = userName;
-                byte[] data = Encoding.Unicode.GetBytes(message);
-                stream.Write(data, 0, data.Length);
+                userName = GetNickname(); // Получаем уникальный nickname
 
                 // запускаем новый поток для получения данных
                 Thread receiveThread = new Thread(new ThreadStart(ReceiveMessage));
@@ -42,6 +38,28 @@ namespace ChatClient
                 Disconnect();
             }
         }
+
+        static string GetNickname()
+        {
+            var dataFrom = new byte[64]; // буфер для получаемых данных
+            var nickname = string.Empty;
+            var answer = 0;
+
+            while(answer != 1)
+            {
+                Console.Write("Введите свое имя: ");
+                nickname = Console.ReadLine();
+
+                var dataTo = Encoding.Unicode.GetBytes(nickname);
+                stream.Write(dataTo, 0, dataTo.Length);
+
+                stream.Read(dataFrom, 0, dataFrom.Length);
+                answer = BitConverter.ToInt32(dataFrom, 0);
+            }
+
+            return nickname;
+        }
+
         // отправка сообщений
         static void SendMessage()
         {
@@ -59,8 +77,6 @@ namespace ChatClient
         {
             while (true)
             {
-                Console.WriteLine("123");
-
                 try
                 {
                     byte[] data = new byte[64]; // буфер для получаемых данных
