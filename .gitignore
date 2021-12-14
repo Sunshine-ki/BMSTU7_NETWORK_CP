@@ -612,3 +612,5 @@ $RECYCLE.BIN/
 *.msi
 *.msm
 *.msp
+/ChatClient/.vs/ChatClient/DesignTimeBuild
+/ChatServer/.vs/ChatServer/DesignTimeBuild
