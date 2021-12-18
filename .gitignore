@@ -614,3 +614,4 @@ $RECYCLE.BIN/
 *.msp
 /ChatClient/.vs/ChatClient/DesignTimeBuild
 /ChatServer/.vs/ChatServer/DesignTimeBuild
+/NetworkServices/.vs/NetworkServices/DesignTimeBuild

@@ -2,32 +2,27 @@
 using System.Threading;
 using System.Net.Sockets;
 using System.Text;
+using System.Linq;
+using System.Numerics;
+using NetworkServices;
 
 namespace ChatClient
 {
     class Program
     {
-        static string userName;
-        private const string host = "127.0.0.1";
-        private const int port = 8888;
-        static TcpClient client;
-        static NetworkStream stream;
+        private static Client client;
 
         static void Main(string[] args)
         {
-            client = new TcpClient();
             try
             {
-                client.Connect(host, port); //подключение клиента
-                stream = client.GetStream(); // получаем поток
+                client = new Client();
 
-                userName = GetNickname(); // Получаем уникальный nickname
+                Thread receiveThread = new Thread(new ThreadStart(client.ReceiveMessage));
+                receiveThread.Start();
 
-                // запускаем новый поток для получения данных
-                Thread receiveThread = new Thread(new ThreadStart(ReceiveMessage));
-                receiveThread.Start(); //старт потока
-                Console.WriteLine("Добро пожаловать, {0}", userName);
-                SendMessage();
+                Console.WriteLine($"[You communicate under: {client.UserName}]");
+                client.SendMessage();
             }
             catch (Exception ex)
             {
@@ -35,79 +30,10 @@ namespace ChatClient
             }
             finally
             {
-                Disconnect();
+                client.Disconnect();
             }
         }
 
-        static string GetNickname()
-        {
-            var dataFrom = new byte[64]; // буфер для получаемых данных
-            var nickname = string.Empty;
-            var answer = 0;
-
-            while(answer != 1)
-            {
-                Console.Write("Введите свое имя: ");
-                nickname = Console.ReadLine();
-
-                var dataTo = Encoding.Unicode.GetBytes(nickname);
-                stream.Write(dataTo, 0, dataTo.Length);
-
-                stream.Read(dataFrom, 0, dataFrom.Length);
-                answer = BitConverter.ToInt32(dataFrom, 0);
-            }
-
-            return nickname;
-        }
-
-        // отправка сообщений
-        static void SendMessage()
-        {
-            Console.WriteLine("Введите сообщение: ");
-
-            while (true)
-            {
-                string message = Console.ReadLine();
-                byte[] data = Encoding.Unicode.GetBytes(message);
-                stream.Write(data, 0, data.Length);
-            }
-        }
-        // получение сообщений
-        static void ReceiveMessage()
-        {
-            while (true)
-            {
-                try
-                {
-                    byte[] data = new byte[64]; // буфер для получаемых данных
-                    StringBuilder builder = new StringBuilder();
-                    int bytes = 0;
-                    do
-                    {
-                        bytes = stream.Read(data, 0, data.Length);
-                        builder.Append(Encoding.Unicode.GetString(data, 0, bytes));
-                    }
-                    while (stream.DataAvailable);
-
-                    string message = builder.ToString();
-                    Console.WriteLine(message);//вывод сообщения
-                }
-                catch
-                {
-                    Console.WriteLine("Подключение прервано!"); //соединение было прервано
-                    Console.ReadLine();
-                    Disconnect();
-                }
-            }
-        }
-
-        static void Disconnect()
-        {
-            if (stream != null)
-                stream.Close();//отключение потока
-            if (client != null)
-                client.Close();//отключение клиента
-            Environment.Exit(0); //завершение процесса
-        }
+    
     }
 }

@@ -5,9 +5,10 @@ namespace ChatServer
 {
     class Program
     {
-        static ServerObject server; // сервер
-        static Thread listenThread; // потока для прослушивания
-        static void Main(string[] args)
+        private static ServerObject server;
+        private static Thread listenThread; 
+        
+        static void Main(string[] args)
         {
             try
             {
