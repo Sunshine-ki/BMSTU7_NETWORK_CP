@@ -24,6 +24,8 @@ namespace ChatServer
         // Все пары клиентов, которые соединились друг с другом
         ClientPairs _clientPairs = new ClientPairs();
 
+        List<string> _nicknames = new List<string>();
+
         /// <summary>
         /// Прослушивание входящих подключений
         /// </summary>
@@ -103,10 +105,27 @@ namespace ChatServer
             return _waitingClients.Exists(c => c.Nickname == nickname);
         }
 
+        protected internal bool ExistsNickname(string nickname)
+        {
+            return _nicknames.Contains(nickname);
+        }
+
         protected internal void AddWaitingClient(ClientObject clientObject)
         {
             _waitingClients.Add(clientObject);
         }
+
+        protected internal void AddNicknames(string nickname)
+        {
+            _nicknames.Add(nickname);
+        }
+
+        protected internal void RemoveNicknames(string nickname)
+        {
+            _nicknames.Remove(nickname);
+        }
+
+
 
         protected internal void SendByNickname(string nickname, string message)
         {
@@ -122,15 +141,14 @@ namespace ChatServer
         {
             var client = _waitingClients.FirstOrDefault(c => c.Id == id);
 
-            if (client is null)
+            if (client != null)
             {
-                client = _clientPairs.FirstOrDefault(kvp => kvp.Key.Id == id).Key;
-                if (client is null)
-                    client = _clientPairs.FirstOrDefault(kvp => kvp.Value.Id == id).Value;
+                _waitingClients.Remove(client);
+                return;
             }
 
-            if (client != null)
-                _waitingClients.Remove(client);
+            _clientPairs.RemoveAll(kvp => kvp.Key.Id == id);
+            _clientPairs.RemoveAll(kvp => kvp.Value.Id == id);
         }
 
         /// <summary>

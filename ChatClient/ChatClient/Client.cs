@@ -80,6 +80,8 @@ namespace ChatClient
                 Console.Write("Enter the name of the interlocutor: ");
                 interlocutor = Console.ReadLine();
 
+                if (interlocutor.Equals(UserName)) continue;
+
                 WriteServices.SendString(Stream, interlocutor);
                 answer = ReadServices.GetNumber(Stream);
             }
