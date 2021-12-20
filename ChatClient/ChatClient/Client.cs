@@ -12,7 +12,8 @@ namespace ChatClient
     {
         protected internal NetworkStream Stream { get; private set; }
         protected internal string UserName { get; private set; }
-        
+        protected internal string Interlocutor { get; private set; } = string.Empty;
+
         private TcpClient _client;
         private int _privateKey;
 
@@ -65,14 +66,14 @@ namespace ChatClient
             }
             else if (action.Equals("connect"))
             {
-                chooseNicknameOfInterlocutor();
+                Interlocutor = chooseNicknameOfInterlocutor();
                 _privateKey = DiffieHellman.Connect(Stream);
             }
         }
 
         private string chooseNicknameOfInterlocutor()
         {
-            var interlocutor = string.Empty;
+            var interlocutor = "Interlocutor";
             var answer = 0;
 
             while (answer != 1)
@@ -116,7 +117,8 @@ namespace ChatClient
             while (true)
             {
                 string message = Console.ReadLine();
-
+                //Console.WriteLine($"{UserName}: {message}");
+                
                 // TODO: Symmetric encryption
 
                 WriteServices.SendString(Stream, message);
@@ -133,7 +135,10 @@ namespace ChatClient
                 try
                 {
                     string message = ReadServices.GetMessage(Stream);
-                    Console.WriteLine(message);
+
+                    // TODO: Symmetric decryption
+
+                    Console.WriteLine($"{Interlocutor}: {message}");
                 }
                 catch
                 {
