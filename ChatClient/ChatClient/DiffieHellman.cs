@@ -12,9 +12,9 @@ namespace ChatClient
     {
         private static Random random = new Random();
 
-        public static int Connect(NetworkStream stream) // todo: replace NetworkStream  to Stream
+        public static int Connect(NetworkStream stream)
         {
-            int g = random.Next(Constants.MinValueG, Constants.MaxValueG);
+            int g = getRandomPrimeNum(Constants.MinValueG, Constants.MaxValueG); // Should be simple 
             // p is public prime number.
             int p = getRandomPrimeNum(Constants.MinValueP, Constants.MaxValueP); // Should be simple 
             // a is private key for Alice
