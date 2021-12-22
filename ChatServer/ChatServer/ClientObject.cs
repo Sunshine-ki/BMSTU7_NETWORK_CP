@@ -35,23 +35,21 @@ namespace ChatServer
             {
                 Stream = _client.GetStream();
                 Nickname = GetNickname();
+                Console.WriteLine($"{Nickname} connect");
                 _server.AddNickname(Nickname);
                 selectAction();
 
-                Console.WriteLine($"{Nickname} connect");
-                //string message;
-                //byte[] data;
+                byte[] data;
                 while (true)
                 {
                     try
                     {
-                        var data = ReadServices.GetByteArray(Stream);
+                        data = ReadServices.GetByteArray(Stream);
                         _server.SendToInterlocutor(Nickname, data);
                     }
                     catch
                     {
                         var msg = $"{Nickname}: disconnect";
-                        //_server.SendToInterlocutor(Nickname, msg);
                         Console.WriteLine(msg);
                         break;
                     }
@@ -63,7 +61,6 @@ namespace ChatServer
             }
             finally
             {
-                Console.WriteLine($"{Nickname}: finally");
                 _server.RemoveConnection(Id);
                 _server.RemoveNicknames(Nickname);
                 Close();

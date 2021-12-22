@@ -28,7 +28,7 @@ namespace ChatClient
             var B = ReadServices.GetNumber(stream); // This is public key (for Bob)
             var privateKey = (int)BigInteger.ModPow(B, a, p);
             
-            Console.WriteLine($"privateKey (connect) = {privateKey}");
+            //Console.WriteLine($"privateKey (connect) = {privateKey}");
             return privateKey;
         }
 
@@ -49,7 +49,7 @@ namespace ChatClient
             var privateKey = (int)BigInteger.ModPow(A, b, p);
             WriteServices.SendNumber(stream, B);
             
-            Console.WriteLine($"privateKey (wait)= {privateKey}");
+            //Console.WriteLine($"privateKey (wait)= {privateKey}");
             return privateKey;
         }
 

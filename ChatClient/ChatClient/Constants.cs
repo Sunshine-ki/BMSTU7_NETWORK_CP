@@ -10,8 +10,8 @@ namespace ChatClient
         public const int Port = 8888;
 
         #region DiffieHellman
-        public static int MinValueP = 10000;
-        public static int MaxValueP = 90000;
+        public static int MinValueP = 10000000; 
+        public static int MaxValueP = 99999999;
 
         public static int MinValueG = 10000;
         public static int MaxValueG = 90000;

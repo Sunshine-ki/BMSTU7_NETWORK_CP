@@ -18,13 +18,7 @@ namespace ChatClient
 
         private TcpClient _client;
         private int _privateKey;
-
-        private byte[] key =
-            {
-                0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
-                0x09, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16,
-            };
-        Encryption encryption;
+        private Encryption encryption;
 
         public Client()
         {
@@ -48,8 +42,6 @@ namespace ChatClient
             var action = selectAction();
             // Создаем общий приватный ключ
             doAction(action);
-
-            encryption = new Encryption(key);
         }
 
         private string selectAction()
@@ -72,18 +64,24 @@ namespace ChatClient
             if (action.Equals("wait"))
             {
                 _privateKey = DiffieHellman.Wait(Stream);
-               
+
+                var key = Encryption.CreatyKeyByInt(_privateKey);
+                encryption = new Encryption(key);
+                Interlocutor = "Interlocutor";
             }
             else if (action.Equals("connect"))
             {
                 Interlocutor = chooseNicknameOfInterlocutor();
                 _privateKey = DiffieHellman.Connect(Stream);
+
+                var key = Encryption.CreatyKeyByInt(_privateKey);
+                encryption = new Encryption(key);
             }
         }
 
         private string chooseNicknameOfInterlocutor()
         {
-            var interlocutor = "Interlocutor";
+            var interlocutor = string.Empty;
             var answer = 0;
 
             while (answer != 1)
