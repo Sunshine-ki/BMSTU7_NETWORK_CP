@@ -34,23 +34,24 @@ namespace ChatServer
             try
             {
                 Stream = _client.GetStream();
-                Nickname = GetFreeNickname();
+                Nickname = GetNickname();
+                _server.AddNickname(Nickname);
                 selectAction();
 
                 Console.WriteLine($"{Nickname} connect");
-                string message;
+                //string message;
+                //byte[] data;
                 while (true)
                 {
                     try
                     {
-                        message = ReadServices.GetMessage(Stream);
-                        Console.WriteLine($"{Nickname}: {message}");
-                        _server.SendToInterlocutor(Nickname, message);
+                        var data = ReadServices.GetByteArray(Stream);
+                        _server.SendToInterlocutor(Nickname, data);
                     }
                     catch
                     {
                         var msg = $"{Nickname}: disconnect";
-                        _server.SendToInterlocutor(Nickname, msg);
+                        //_server.SendToInterlocutor(Nickname, msg);
                         Console.WriteLine(msg);
                         break;
                     }
@@ -62,7 +63,8 @@ namespace ChatServer
             }
             finally
             {
-                _server.RemoveConnection(Id);
+                Console.WriteLine($"{Nickname}: finally");
+                _server.RemoveConnection(Id);
                 _server.RemoveNicknames(Nickname);
                 Close();
             }
@@ -101,7 +103,7 @@ namespace ChatServer
         /// Получает уникальный никнейм для пользователя
         /// </summary>
         /// <returns></returns>
-        private string GetFreeNickname()
+        private string GetNickname()
         {
             var nickname = ReadServices.GetMessage(Stream);
 
@@ -111,7 +113,6 @@ namespace ChatServer
                 nickname = ReadServices.GetMessage(Stream);
             }
             WriteServices.SendNumber(Stream, 1);
-            _server.AddNicknames(nickname);
 
             return nickname;
         }

@@ -18,6 +18,11 @@ namespace NetworkServices
             writeToSream(stream, data);
         }
 
+        public static void SendByteArray(NetworkStream stream, byte[] data)
+        {
+            writeToSream(stream, data);
+        }
+
         private static void writeToSream(NetworkStream stream, byte[] data)
         {
             stream.Write(data, 0, data.Length);

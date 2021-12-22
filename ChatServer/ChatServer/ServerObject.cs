@@ -73,12 +73,7 @@ namespace ChatServer
             Console.WriteLine($"Pair is created {nickname} --- {firstClient.Nickname}");
         }
 
-        /// <summary>
-        /// Отпарялет сообщение собеседнику
-        /// </summary>
-        /// <param name="nickname">Уникальный инлетификатор отправителя</param>
-        /// <param name="message"></param>
-        protected internal void SendToInterlocutor(string nickname, string message)
+        private NetworkStream getInterlocutorStream(string nickname)
         {
             NetworkStream stream = null;
 
@@ -89,16 +84,42 @@ namespace ChatServer
                     stream = cp.Value.Stream;
                     break;
                 }
-                else if(cp.Value.Nickname.Equals(nickname))
+                else if (cp.Value.Nickname.Equals(nickname))
                 {
                     stream = cp.Key.Stream;
                     break;
                 }
             }
 
+            return stream;
+        }
+
+        /// <summary>
+        /// Отпарялет сообщение собеседнику
+        /// </summary>
+        /// <param name="nickname">Уникальный инлетификатор отправителя</param>
+        /// <param name="message"></param>
+        protected internal void SendToInterlocutor(string nickname, string message)
+        {
+            var stream = getInterlocutorStream(nickname);
+
             if (stream != null)
                 WriteServices.SendString(stream, message);
         }
+
+        /// <summary>
+        /// Отпарялет данные собеседнику
+        /// </summary>
+        /// <param name="nickname">Уникальный инлетификатор отправителя</param>
+        /// <param name="message"></param>
+        protected internal void SendToInterlocutor(string nickname, byte[] data)
+        {
+            var stream = getInterlocutorStream(nickname);
+
+            if (stream != null)
+                WriteServices.SendByteArray(stream, data);
+        }
+
 
         protected internal bool ExistsWaitingClient(string nickname)
         {
@@ -115,7 +136,7 @@ namespace ChatServer
             _waitingClients.Add(clientObject);
         }
 
-        protected internal void AddNicknames(string nickname)
+        protected internal void AddNickname(string nickname)
         {
             _nicknames.Add(nickname);
         }

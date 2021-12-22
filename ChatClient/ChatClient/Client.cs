@@ -5,6 +5,8 @@ using System.Linq;
 using System.Net.Sockets;
 using System.Numerics;
 using System.Text;
+using System.Security.Cryptography;
+using System.IO;
 
 namespace ChatClient
 {
@@ -17,6 +19,12 @@ namespace ChatClient
         private TcpClient _client;
         private int _privateKey;
 
+        private byte[] key =
+            {
+                0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
+                0x09, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16,
+            };
+        Encryption encryption;
 
         public Client()
         {
@@ -40,6 +48,8 @@ namespace ChatClient
             var action = selectAction();
             // Создаем общий приватный ключ
             doAction(action);
+
+            encryption = new Encryption(key);
         }
 
         private string selectAction()
@@ -117,11 +127,9 @@ namespace ChatClient
             while (true)
             {
                 string message = Console.ReadLine();
-                //Console.WriteLine($"{UserName}: {message}");
                 
-                // TODO: Symmetric encryption
-
-                WriteServices.SendString(Stream, message);
+                var data = encryption.ToAes256(message);
+                WriteServices.SendByteArray(Stream, data);
             }
         }
 
@@ -134,14 +142,13 @@ namespace ChatClient
             {
                 try
                 {
-                    string message = ReadServices.GetMessage(Stream);
-
-                    // TODO: Symmetric decryption
-
+                    var data = ReadServices.GetByteArray(Stream);
+                    var message = encryption.FromAes256(data);
                     Console.WriteLine($"{Interlocutor}: {message}");
                 }
-                catch
+                catch (Exception e)
                 {
+                    Console.WriteLine($"e = {e.Message}");
                     Console.WriteLine("Connection interrupted");
                     Console.ReadLine();
                     Disconnect();
