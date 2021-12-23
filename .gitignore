@@ -615,3 +615,8 @@ $RECYCLE.BIN/
 /ChatClient/.vs/ChatClient/DesignTimeBuild
 /ChatServer/.vs/ChatServer/DesignTimeBuild
 /NetworkServices/.vs/NetworkServices/DesignTimeBuild
+/src/NetworkServices/.vs/NetworkServices/DesignTimeBuild
+/src/Diffie_Hellman/.vs/Diffie_Hellman/DesignTimeBuild
+/src/ChatServer/.vs/ChatServer/DesignTimeBuild
+/src/ChatClient/.vs/ChatClient/DesignTimeBuild
+/docs/.vs

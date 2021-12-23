@@ -6,7 +6,7 @@ namespace ChatClient
 {
     public static class Constants
     {
-        public const string Host = "127.0.0.1";
+        public const string Host = "172.20.10.4";
         public const int Port = 8888;
 
         #region DiffieHellman
